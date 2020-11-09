@@ -10,7 +10,7 @@ fn main() {
 }
 
 pub fn song() {
-    let days_nb = ["first", "second", "third", "fourth", "fifth", "sixth"];
+    let days_nb = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "10th", "11th", "12th"];
     let day_quote = ["On the ", " day of Christmas my true love gave to me"];
     let items = [
         "a partridge in a pear tree",
@@ -19,33 +19,47 @@ pub fn song() {
         "four calling birds",
         "five gold rings",
         "six geese a laying",
+        "seven swans a-swimming",
+        "eight maids a-milking",
+        "nine ladies dancing",
+        "ten lords a-leaping",
+        "eleven pipers piping",
+        "twelve drummers drumming",
     ];
 
-    let mut lines = Vec::<String>::new();
-    let mut second_line = Vec::<String>::new();
+    let mut lines = Vec::<String>::with_capacity(15);
+    let mut second_line = Vec::<&str>::with_capacity(10);
     for (day, dayline) in days_nb.iter().enumerate() {
         lines.push(format!("{}{}{}", day_quote[0], dayline, day_quote[1]));
         for (i, item) in items.iter().enumerate().take(day + 1) {
             match i {
-                0 => second_line.push(".\n".to_owned()),
-                1 if day > 1  => second_line.push(", and ".to_owned()),
-                2 | 4 => second_line.push(",\n".to_owned()),
-                _ => second_line.push(", ".to_owned()),
+                0 => second_line.push(".\n"),
+                1 if day > 1 => second_line.push(", and "),
+                _ if i % 2 == 0 => second_line.push(",\n"),
+                _ => second_line.push(", "),
             }
-            second_line.push(item.to_owned().to_owned());
+            second_line.push(item.to_owned());
         }
-        lines.push(
+        lines.push(uppercase_first_letter(
             second_line
                 .iter()
                 .rev()
                 .fold(String::new(), |acc, item| acc + item),
-        );
+        ));
         second_line.clear();
     }
 
     println!("\n\t--- Twelve Days of Christmas ---");
     for line in lines {
         println!("{}", line);
+    }
+}
+
+fn uppercase_first_letter(s: String) -> String {
+    let mut c = s.chars();
+    match c.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
     }
 }
 
