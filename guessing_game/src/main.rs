@@ -3,6 +3,116 @@ use std::cmp::Ordering;
 use std::io;
 
 fn main() {
+    song();
+    //fibonacci(10);
+    //degrees();
+    //guess_the_number();
+}
+
+pub fn song() {
+    let days_nb = ["first", "second", "third", "fourth", "fifth", "sixth"];
+    let day_quote = ["On the ", " day of Christmas my true love gave to me"];
+    let items = [
+        "a partridge in a pear tree",
+        "two turtle doves",
+        "three French hens",
+        "four calling birds",
+        "five gold rings",
+        "six geese a laying",
+    ];
+
+    let mut lines = Vec::<String>::new();
+    let mut second_line = Vec::<String>::new();
+    for (day, dayline) in days_nb.iter().enumerate() {
+        lines.push(format!("{}{}{}", day_quote[0], dayline, day_quote[1]));
+        for (i, item) in items.iter().enumerate().take(day + 1) {
+            match i {
+                0 => second_line.push(".\n".to_owned()),
+                1 if day > 1  => second_line.push(", and ".to_owned()),
+                2 | 4 => second_line.push(",\n".to_owned()),
+                _ => second_line.push(", ".to_owned()),
+            }
+            second_line.push(item.to_owned().to_owned());
+        }
+        lines.push(
+            second_line
+                .iter()
+                .rev()
+                .fold(String::new(), |acc, item| acc + item),
+        );
+        second_line.clear();
+    }
+
+    println!("\n\t--- Twelve Days of Christmas ---");
+    for line in lines {
+        println!("{}", line);
+    }
+}
+
+pub fn fibonacci(n: u32) {
+    println!("\n\t--- FIBONACCI ---");
+    println!("Fibonacci({}) = {}", n, fibo_iter(n));
+}
+
+fn _fibo_rec(n: u32) -> u128 {
+    // much less optimized, overflows the stack easily
+    match n {
+        0 => 0,
+        1 => 1,
+        _ => _fibo_rec(n - 1) + _fibo_rec(n - 2),
+    }
+}
+
+fn fibo_iter(n: u32) -> u128 {
+    match n {
+        0 => 0,
+        1 => 1,
+        _ => {
+            let mut fibo_min_2 = 0; // fibo(0)
+            let mut fibo_min_1 = 1; // fibo(1)
+            let mut result: u128 = 1; // fibo(1)
+            for _ in 2..n {
+                result = fibo_min_1 + fibo_min_2; // fibo(i)
+                fibo_min_2 = fibo_min_1;
+                fibo_min_1 = result;
+            }
+            result
+        }
+    }
+}
+
+pub fn degrees() {
+    println!("\n\t--- DEGREES ---");
+
+    let temp_c = DegreesC(20f32);
+    println!(
+        "It's {} degrees C, so {} degrees F.",
+        temp_c.0,
+        convert_c_to_f(temp_c).0
+    );
+
+    let temp_f = DegreesF(77f32);
+    println!(
+        "It's {} degrees F, so {} degrees C.",
+        temp_f.0,
+        convert_f_to_c(temp_f).0
+    );
+}
+
+#[derive(Debug, Clone, Copy)]
+struct DegreesF(f32);
+#[derive(Debug, Clone, Copy)]
+struct DegreesC(f32);
+
+fn convert_c_to_f(deg: DegreesC) -> DegreesF {
+    DegreesF(deg.0 * 9f32 / 5f32 + 32f32)
+}
+
+fn convert_f_to_c(deg: DegreesF) -> DegreesC {
+    DegreesC((deg.0 - 32f32) * 5f32 / 9f32)
+}
+
+pub fn guess_the_number() {
     println!("\n\t--- GUESS THE NUMBER ---");
 
     let secret_number = rand::thread_rng().gen_range(1, 101);
