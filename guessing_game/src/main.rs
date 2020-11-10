@@ -10,7 +10,10 @@ fn main() {
 }
 
 pub fn song() {
-    let days_nb = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "10th", "11th", "12th"];
+    let day_ordinals = [
+        "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
+        "10th", "11th", "12th",
+    ];
     let day_quote = ["On the ", " day of Christmas my true love gave to me"];
     let items = [
         "a partridge in a pear tree",
@@ -27,32 +30,43 @@ pub fn song() {
         "twelve drummers drumming",
     ];
 
-    let mut lines = Vec::<String>::with_capacity(15);
-    let mut second_line = Vec::<&str>::with_capacity(10);
-    for (day, dayline) in days_nb.iter().enumerate() {
-        lines.push(format!("{}{}{}", day_quote[0], dayline, day_quote[1]));
-        for (i, item) in items.iter().enumerate().take(day + 1) {
-            match i {
-                0 => second_line.push(".\n"),
-                1 if day > 1 => second_line.push(", and "),
-                _ if i % 2 == 0 => second_line.push(",\n"),
-                _ => second_line.push(", "),
-            }
-            second_line.push(item.to_owned());
-        }
-        lines.push(uppercase_first_letter(
-            second_line
-                .iter()
-                .rev()
-                .fold(String::new(), |acc, item| acc + item),
-        ));
-        second_line.clear();
-    }
+    let format_item = |item_index, item, day_index| {
+        let divider = match item_index {
+            0 => ".\n",
+            1 if day_index > 1 => ", and ",
+            _ if item_index % 2 == 0 => ",\n",
+            _ => ", ",
+        };
+        format!("{}{}", item, divider)
+    };
 
-    println!("\n\t--- Twelve Days of Christmas ---");
-    for line in lines {
-        println!("{}", line);
-    }
+    let format_paragraph = |(day_index, day_ordinal)| {
+        let items_string = items
+            .iter()
+            .enumerate()
+            .take(day_index + 1)
+            .map(|(index, item)| format_item(index, item, day_index))
+            .rev()
+            .fold(String::new(), |acc, item| format!("{}{}", acc, item));
+
+        format!(
+            "{}{}{}\n{}",
+            day_quote[0],
+            day_ordinal,
+            day_quote[1],
+            uppercase_first_letter(items_string)
+        )
+    };
+
+    let text: String = day_ordinals
+        .iter()
+        .enumerate()
+        .map(format_paragraph)
+        .fold(String::new(), |text, paragraph| {
+            format!("{}\n{}", text, paragraph)
+        });
+
+    println!("\n\t--- Twelve Days of Christmas ---\n{}", text);
 }
 
 fn uppercase_first_letter(s: String) -> String {
