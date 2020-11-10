@@ -1,12 +1,46 @@
 use rand::Rng;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::io;
 
 fn main() {
-    song();
+    let data = [3, 1, 1, 2, 1];
+    dbg!(stats(&data));
+    //song();
     //fibonacci(10);
     //degrees();
     //guess_the_number();
+}
+
+pub fn stats(data: &[i32]) -> (f32, f32, i32) {
+    let mean = data.iter().sum::<i32>() as f32 / data.iter().count() as f32;
+
+    let mut occurences = HashMap::new();
+    for &nb in data {
+        let entry = occurences.entry(nb).or_insert(0);
+        *entry += 1;
+    }
+    let (mode, _) = occurences
+        .into_iter()
+        .max_by_key(|(_, occurences)| *occurences)
+        .unwrap();
+
+    let mut data = data.to_owned();
+    data.sort_unstable();
+    let count = data.iter().count();
+    let median = match count {
+        _ if count % 2 == 0 => {
+            data.into_iter()
+                .take((count / 2) + 1)
+                .rev()
+                .take(2)
+                .sum::<i32>() as f32
+                / 2f32
+        }
+        _ => data.into_iter().take((count / 2) + 1).last().unwrap() as f32,
+    };
+
+    (mean, median, mode)
 }
 
 pub fn song() {
@@ -29,6 +63,10 @@ pub fn song() {
         "eleven pipers piping",
         "twelve drummers drumming",
     ];
+
+    for &day in &day_ordinals {
+        println!("{}", day);
+    }
 
     let format_item = |item_index, item, day_index| {
         let divider = match item_index {
