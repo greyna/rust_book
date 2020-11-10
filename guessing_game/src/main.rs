@@ -45,7 +45,7 @@ pub fn song() {
             .iter()
             .enumerate()
             .take(day_index + 1)
-            .map(|(index, item)| format_item(index, item, day_index))
+            .map(|(index, &item)| format_item(index, item, day_index))
             .rev()
             .fold(String::new(), |acc, item| format!("{}{}", acc, item));
 
