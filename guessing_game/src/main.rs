@@ -40,21 +40,21 @@ pub fn song() {
         format!("{}{}", item, divider)
     };
 
-    let format_paragraph = |(day_index, day_ordinal)| {
-        let items_string = items
+    let format_paragraph = |(day_index, &day_ordinal)| {
+        let items_sentence = items
             .iter()
             .enumerate()
             .take(day_index + 1)
             .map(|(index, &item)| format_item(index, item, day_index))
             .rev()
-            .fold(String::new(), |acc, item| format!("{}{}", acc, item));
+            .fold(String::new(), |acc, item| acc + &item);
 
         format!(
-            "{}{}{}\n{}",
+            "\n{}{}{}\n{}",
             day_quote[0],
             day_ordinal,
             day_quote[1],
-            uppercase_first_letter(items_string)
+            uppercase_first_letter(items_sentence)
         )
     };
 
@@ -62,9 +62,7 @@ pub fn song() {
         .iter()
         .enumerate()
         .map(format_paragraph)
-        .fold(String::new(), |text, paragraph| {
-            format!("{}\n{}", text, paragraph)
-        });
+        .fold(String::new(), |text, paragraph| text + &paragraph);
 
     println!("\n\t--- Twelve Days of Christmas ---\n{}", text);
 }
