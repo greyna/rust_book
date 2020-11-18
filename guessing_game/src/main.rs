@@ -1,12 +1,13 @@
 use rand::Rng;
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::fmt::Write;
 use std::io;
 
 fn main() {
-    let data = [3, 1, 1, 2, 1];
-    dbg!(stats(&data));
-    //song();
+    //let data = [3, 1, 1, 2, 1];
+    //dbg!(stats(&data));
+    song();
     //fibonacci(10);
     //degrees();
     //guess_the_number();
@@ -64,45 +65,43 @@ pub fn song() {
         "twelve drummers drumming",
     ];
 
-    for &day in &day_ordinals {
-        println!("{}", day);
-    }
-
-    let format_item = |item_index, item, day_index| {
-        let divider = match item_index {
-            0 => ".\n",
-            1 if day_index > 1 => ", and ",
-            _ if item_index % 2 == 0 => ",\n",
-            _ => ", ",
-        };
-        format!("{}{}", item, divider)
+    let get_divider = |item_index, day_index| match item_index {
+        0 => ".\n",
+        1 if day_index > 1 => ", and ",
+        _ if item_index % 2 == 0 => ",\n",
+        _ => ", ",
     };
 
-    let format_paragraph = |(day_index, &day_ordinal)| {
+    let get_items_sentence = |day_index| {
         let items_sentence = items
             .iter()
             .enumerate()
             .take(day_index + 1)
-            .map(|(index, &item)| format_item(index, item, day_index))
-            .rev()
-            .fold(String::new(), |acc, item| acc + &item);
+            .map(|(index, &item)| (item, get_divider(index, day_index)))
+            .rev();
 
-        format!(
+        let mut sentence = String::new();
+        for (item, divider) in items_sentence {
+            write!(&mut sentence, "{}{}", item, divider).unwrap();
+        }
+        
+        uppercase_first_letter(sentence)
+    };
+
+    let mut text = String::from("\n\t--- Twelve Days of Christmas ---\n");
+    for (day_index, &day_ordinal) in day_ordinals.iter().enumerate() {
+        write!(
+            &mut text,
             "\n{}{}{}\n{}",
             day_quote[0],
             day_ordinal,
             day_quote[1],
-            uppercase_first_letter(items_sentence)
+            get_items_sentence(day_index)
         )
-    };
+        .unwrap();
+    }
 
-    let text: String = day_ordinals
-        .iter()
-        .enumerate()
-        .map(format_paragraph)
-        .fold(String::new(), |text, paragraph| text + &paragraph);
-
-    println!("\n\t--- Twelve Days of Christmas ---\n{}", text);
+    println!("{}", text);
 }
 
 fn uppercase_first_letter(s: String) -> String {
