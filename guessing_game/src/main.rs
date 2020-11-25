@@ -7,10 +7,22 @@ use std::io;
 fn main() {
     //let data = [3, 1, 1, 2, 1];
     //dbg!(stats(&data));
-    song();
+    //song();
     //fibonacci(10);
     //degrees();
     //guess_the_number();
+}
+
+pub fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut largest: &T = &list[0]; // mut ref to immut value
+
+    for item in list {
+        if item > largest {
+            largest = &item;
+        }
+    }
+
+    largest
 }
 
 pub fn stats(data: &[i32]) -> (f32, f32, i32) {
@@ -21,9 +33,9 @@ pub fn stats(data: &[i32]) -> (f32, f32, i32) {
         let entry = occurences.entry(nb).or_insert(0);
         *entry += 1;
     }
-    let (mode, _) = occurences
-        .into_iter()
-        .max_by_key(|(_, occurences)| *occurences)
+    let (&mode, _) = occurences
+        .iter()
+        .max_by_key(|(_, &occurences)| occurences)
         .unwrap();
 
     let mut data = data.to_owned();
@@ -31,14 +43,9 @@ pub fn stats(data: &[i32]) -> (f32, f32, i32) {
     let count = data.iter().count();
     let median = match count {
         _ if count % 2 == 0 => {
-            data.into_iter()
-                .take((count / 2) + 1)
-                .rev()
-                .take(2)
-                .sum::<i32>() as f32
-                / 2f32
+            data.iter().take((count / 2) + 1).rev().take(2).sum::<i32>() as f32 / 2f32
         }
-        _ => data.into_iter().take((count / 2) + 1).last().unwrap() as f32,
+        _ => *data.iter().take((count / 2) + 1).last().unwrap() as f32,
     };
 
     (mean, median, mode)
@@ -84,7 +91,7 @@ pub fn song() {
         for (item, divider) in items_sentence {
             write!(&mut sentence, "{}{}", item, divider).unwrap();
         }
-        
+
         uppercase_first_letter(sentence)
     };
 
